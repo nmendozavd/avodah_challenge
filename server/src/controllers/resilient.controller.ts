@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { fetchWithRetry } from "../services/resilient.service.js";
+import { fetchWithRetry } from "../services/resilient.service";
 
 export const getResilientData = async (req: Request, res: Response) => {
   const url = "http://localhost:3000/"; 
