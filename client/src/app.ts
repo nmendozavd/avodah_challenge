@@ -14,9 +14,8 @@ type HomeResponse = {
   message: string;
 };
 app.get<{}, HomeResponse>("/", async (req, res) => {
-
+  // fetch from server 
   let response = await fetch ("http://localhost:3000"); 
-
   // if response is 200 
   if (response.status === 200) {
     // implement promise to get response body
@@ -33,9 +32,6 @@ app.get<{}, HomeResponse>("/", async (req, res) => {
     });
   }
 
-  // res.json({
-  //   message: "🦄🌈✨👋🌎🌍🌏✨🌈🦄",
-  // });
 });
 
 export default app;
