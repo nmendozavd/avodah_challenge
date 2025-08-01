@@ -13,6 +13,7 @@ app.use(express.json());
 type HomeResponse = {
   message: string;
 };
+
 app.get<{}, HomeResponse>("/", (req, res) => {
   // utilize random number to generate between 0 and 1
   let randomNum = Math.random();
@@ -26,6 +27,24 @@ app.get<{}, HomeResponse>("/", (req, res) => {
     res.status (500).json({
       message: "500 Internal Server Error"
     })
+  }
+});
+
+
+
+app.get("/resilient-consumer", async (req, res) => {
+  const url = "http://localhost:3000/"; 
+
+  try {
+    const data = await fetchWithRetry(url, 3, 500);
+    res.status(200).json({ 
+      success: true, 
+      data });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: (err as Error).message,
+    });
   }
 });
 
