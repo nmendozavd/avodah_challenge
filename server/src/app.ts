@@ -14,16 +14,17 @@ type HomeResponse = {
   message: string;
 };
 app.get<{}, HomeResponse>("/", (req, res) => {
-  // utilize random to generate between 0 and 1
-  let randomAPI = Math.random();
-    // if num is equal less than .60
-  if (randomAPI <= .60) {
+  // utilize random number to generate between 0 and 1
+  let randomNum = Math.random();
+    // if num is equal or less than .60
+  if (randomNum <= .60) {
     res.json({
       message: "🦄🌈✨👋🌎🌍🌏✨🌈🦄",
     });
+  // otherise send a 500 
   } else {
     res.status (500).json({
-      message: "Error 500"
+      message: "500 Internal Server Error"
     })
   }
 });
