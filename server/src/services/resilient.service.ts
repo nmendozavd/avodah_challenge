@@ -1,20 +1,23 @@
+import { getCache, setCache } from "./cache";
+
 type CacheEntry = {
   data: any;
   expiresAt: number;
 };
 
-const cache: Record<string, CacheEntry> = {};
+const CACHE_TTL = 30_000; // 30 seconds
 
 export async function fetchWithRetry(
   url: string,
   maxRetries: number = 3,
   baseDelay: number = 500
 ): Promise<any> {
-  const now = Date.now();
 
-  if (cache[url] && cache[url].expiresAt > now) {
-    return cache[url].data;
-  }
+  const cached = getCache(url);
+
+  if (cached) {
+    return cached;
+  };
 
   let attempt = 0;
   while (attempt <= maxRetries) {
@@ -23,10 +26,7 @@ export async function fetchWithRetry(
         if (response.ok) {
         const data = await response.json();
 
-        cache[url] = {
-          data,
-          expiresAt: now + 30_000, // 30 seconds
-        };
+        setCache(url, data, CACHE_TTL);
 
         return data;
       } else {
