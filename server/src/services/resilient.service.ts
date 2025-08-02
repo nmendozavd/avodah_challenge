@@ -1,8 +1,8 @@
 import { getCache, setCache } from "./cache.service";
 import { CircuitBreaker } from "./circuitBreaker.service";
+import { metrics } from "./metrics.service";
 
-
-// Cache and Circuit Breaker configuration
+// cache, circuit Breaker, timeout configuration
 const CACHE_TTL = 30_000; // 30 seconds
 const breaker = new CircuitBreaker();
 
@@ -11,10 +11,12 @@ export async function fetchWithRetry(
   maxRetries: number = 3,
   baseDelay: number = 500
 ): Promise<any> {
+  metrics.logRequest();
 
   const cached = getCache(url);
 
   if (cached) {
+    metrics.logCacheHit(url);
     return cached;
   };
 
@@ -23,19 +25,24 @@ export async function fetchWithRetry(
     try {
       const response = await fetch(url);
 
-        if (response.ok) {
+      if (response.ok) {
         const data = await response.json();
-
+        
         setCache(url, data, CACHE_TTL);
         breaker.recordSuccess();
+        metrics.logSuccess();
+        
         return data;
-
       } else {
         throw new Error(`HTTP Error: ${response.status}`);
       }
     } catch (err) {
+
+      metrics.logRetry(attempt);
+
       if (attempt === maxRetries) {
         breaker.recordFailure();
+        metrics.logFailure();
         throw new Error(`Failed after ${attempt + 1} attempts: ${(err as Error).message}`);
       };
       const delay = baseDelay * Math.pow(2, attempt);

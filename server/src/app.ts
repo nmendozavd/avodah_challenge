@@ -5,6 +5,7 @@ import cors from "cors";
 
 import rootRoutes from "./routes/root.routes";
 import resilientRoutes from "./routes/resilient.routes";
+import metricRoutes from "./routes/metrics.routes";
 
 const app = express();
 
@@ -15,5 +16,6 @@ app.use(express.json());
 
 app.use("/", rootRoutes);     
 app.use("/", resilientRoutes);
+app.use("/", metricRoutes);
 
 export default app;
